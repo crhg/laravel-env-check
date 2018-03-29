@@ -13,7 +13,7 @@ Laravelはartisanコマンドの`--env`オプションや`APP_ENV`環境変数�
 # インストール
 
 ```console
-composer install crhg/laravel-env-check
+composer require crhg/laravel-env-check
 ```
 
 # 例

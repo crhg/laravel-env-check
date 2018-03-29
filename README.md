@@ -11,7 +11,7 @@ Since this is potentially dangerous, this package adds the ability to check if t
 # INSTALL
 
 ```console
-composer install crhg/laravel-env-check
+composer require crhg/laravel-env-check
 ```
 
 # EXAMPLE
