@@ -1,0 +1,14 @@
+{
+    "name": "crhg/laravel-env-check",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Manabu Matsui",
+            "email": "manabu.matsui@gmail.com"
+        }
+    ],
+    "require": {
+        "illuminate/support": "^5.6"
+    }
+}
