@@ -24,7 +24,7 @@ class EnvCheckServiceProvider extends ServiceProvider
     }
 
     /**
-     * If --env option is specified, check specified environment is equals to that of application.
+     * If --env option is specified, check specified environment is equals to app.env configuration.
      * If they are different, throws an exception.
      *
      * @param array $args
@@ -34,12 +34,12 @@ class EnvCheckServiceProvider extends ServiceProvider
     {
         $env_arg = $this->detectConsoleEnvironment($args);
 
-        if (isset($env_arg) && $env_arg !== $this->app->environment()) {
+        if (isset($env_arg) && $env_arg !== config('app.env')) {
             throw new \Exception(
                 sprintf(
-                    '--env option is specified but its different from current environment. (opt=%s, cur=%s)',
+                    '--env option is specified but its different from current environment. (opt=%s, app.env=%s)',
                     $env_arg,
-                    $this->app->environment()
+                    config('app.env')
                 )
             );
         }
