@@ -4,7 +4,8 @@ If the environment is specified with the `--env` option, it will cause an error 
 
 # DESCRIPTION
 
-Artisan command can specify the environment with the `--env` option, but it is a specification that ignores `--env` option when the configuration is cached.
+Artisan command can specify the environment with the `--env` option, but `--env` option is ignored when the configuration is cached.
+
 Since this is potentially dangerous, this package adds the ability to check if the environment specified by the `--env` option is equal to the setting of `app.env`.
 
 # INSTALL
@@ -23,7 +24,4 @@ If `local` environment is cached:
 In EnvCheckServiceProvider.php line 38:
 
   --env option is specified but its different from current environment. (opt=testing, app.env=local)
-
-
-zsh: exit 1     php artisan --env=testing migrate:status
-```
+  ```

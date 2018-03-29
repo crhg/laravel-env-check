@@ -26,7 +26,4 @@ composer install crhg/laravel-env-check
 In EnvCheckServiceProvider.php line 38:
 
   --env option is specified but its different from current environment. (opt=testing, app.env=local)
-
-
-zsh: exit 1     php artisan --env=testing migrate:status
 ```
