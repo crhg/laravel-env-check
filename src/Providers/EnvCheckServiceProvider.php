@@ -21,8 +21,6 @@ class EnvCheckServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->checkEnvironmentArgument($_SERVER['argv']);
-
-
     }
 
     /**
@@ -37,7 +35,13 @@ class EnvCheckServiceProvider extends ServiceProvider
         $env_arg = $this->getEnvironmentArgument($args);
 
         if (isset($env_arg) && $env_arg !== $this->app->environment()) {
-            throw new \Exception('--env option is specified but its different from current environment.');
+            throw new \Exception(
+                sprintf(
+                    '--env option is specified but its different from current environment. (opt=%s, cur=%s)',
+                    $env_arg,
+                    $this->app->environment()
+                )
+            );
         }
     }
 
