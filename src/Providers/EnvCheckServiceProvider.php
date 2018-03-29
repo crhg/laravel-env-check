@@ -20,7 +20,7 @@ class EnvCheckServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->checkEnvironment($_SERVER['argv'], $_ENV);
+        $this->checkEnvironment($_SERVER['argv']);
     }
 
     /**
@@ -28,12 +28,11 @@ class EnvCheckServiceProvider extends ServiceProvider
      * If they are different, throws an exception.
      *
      * @param array $args
-     * @param array $env
      * @throws \Exception
      */
-    protected function checkEnvironment(array $args, array $env)
+    protected function checkEnvironment(array $args)
     {
-        $specified_env = $this->detectConsoleEnvironment($args) ?? $this->detectAppEnvEnvironment($env);
+        $specified_env = $this->detectConsoleEnvironment($args) ?? $this->detectAppEnvEnvironment();
 
         if (isset($specified_env) && $specified_env !== config('app.env')) {
             throw new \Exception(
@@ -49,12 +48,12 @@ class EnvCheckServiceProvider extends ServiceProvider
     /**
      * Detect environment from environment variables
      *
-     * @param array $env
-     * @return mixed|null
+     * @return string|null
      */
-    protected function detectAppEnvEnvironment(array $env)
+    protected function detectAppEnvEnvironment()
     {
-        return $env['APP_ENV'] ?? null;
+        $env = \getenv('APP_ENV');
+        return ($env !== false)? $env: null;
     }
 
     /**
