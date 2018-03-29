@@ -32,7 +32,7 @@ class EnvCheckServiceProvider extends ServiceProvider
      */
     protected function checkEnvironmentArgument(array $args)
     {
-        $env_arg = $this->getEnvironmentArgument($args);
+        $env_arg = $this->detectConsoleEnvironment($args);
 
         if (isset($env_arg) && $env_arg !== $this->app->environment()) {
             throw new \Exception(
@@ -43,6 +43,21 @@ class EnvCheckServiceProvider extends ServiceProvider
                 )
             );
         }
+    }
+
+    /**
+     * Detect environment from command-line arguments.
+     *
+     * @param  array  $args
+     * @return string|null
+     */
+    protected function detectConsoleEnvironment(array $args)
+    {
+        if (! is_null($value = $this->getEnvironmentArgument($args))) {
+            return head(array_slice(explode('=', $value), 1));
+        }
+
+        return null;
     }
 
     /**
