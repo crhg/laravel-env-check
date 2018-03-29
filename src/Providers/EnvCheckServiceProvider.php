@@ -37,7 +37,7 @@ class EnvCheckServiceProvider extends ServiceProvider
         if (isset($specified_env) && $specified_env !== config('app.env')) {
             throw new \Exception(
                 sprintf(
-                    '--env option is specified but its different from current environment. (specified=%s, app.env=%s)',
+                    'env is specified but its different from current environment. (specified=%s, app.env=%s)',
                     $specified_env,
                     config('app.env')
                 )
