@@ -132,7 +132,7 @@ class EnvChecker
      *
      * @return null|string
      */
-    protected function dotEnvHash()
+    public function dotEnvHash()
     {
         $dot_env_path = $this->dotEnvPath();
         if (!(isset($dot_env_path) && file_exists($dot_env_path))) {
