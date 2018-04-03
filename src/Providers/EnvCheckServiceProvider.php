@@ -31,7 +31,7 @@ class EnvCheckServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->register(EnvChecker::class);
+        $this->app->bind(EnvChecker::class);
     }
 
     /**
