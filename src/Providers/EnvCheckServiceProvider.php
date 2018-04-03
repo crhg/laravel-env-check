@@ -9,9 +9,8 @@
 namespace Crhg\EnvCheck\Providers;
 
 
-use Illuminate\Support\Arr;
+use Crhg\EnvCheck\EnvChecker;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 
 class EnvCheckServiceProvider extends ServiceProvider
 {
@@ -20,70 +19,29 @@ class EnvCheckServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->checkEnvironment($_SERVER['argv']);
+        $this->publishes([
+            __DIR__.'/../../config/env_check.php' => config_path('env_check.php'),
+        ]);
+
+        $this->check();
     }
 
     /**
-     * If --env option is specified, check specified environment is equals to app.env configuration.
-     * If they are different, throws an exception.
      *
-     * @param array $args
-     * @throws \Exception
      */
-    protected function checkEnvironment(array $args)
+    public function register()
     {
-        $specified_env = $this->detectConsoleEnvironment($args) ?? $this->detectAppEnvEnvironment();
-
-        if (isset($specified_env) && $specified_env !== config('app.env')) {
-            throw new \Exception(
-                sprintf(
-                    'env is specified but its different from current environment. (specified=%s, app.env=%s)',
-                    $specified_env,
-                    config('app.env')
-                )
-            );
-        }
+        $this->app->register(EnvChecker::class);
     }
 
     /**
-     * Detect environment from environment variables
      *
-     * @return string|null
      */
-    protected function detectAppEnvEnvironment()
+    protected function check()
     {
-        $env = \getenv('APP_ENV');
-        return ($env !== false)? $env: null;
-    }
+        $checker = $this->app->make(EnvChecker::class);
 
-    /**
-     * Detect environment from command-line arguments.
-     *
-     * @param  array  $args
-     * @return string|null
-     */
-    protected function detectConsoleEnvironment(array $args)
-    {
-        if (! is_null($value = $this->getEnvironmentArgument($args))) {
-            return head(array_slice(explode('=', $value), 1));
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the environment argument from the console.
-     *
-     * XXX: This function is a copy of Illuminate\Foundation\EnvironmentDetector::getEnvironmentArgument().
-     *      It is undesirable to copy it, but it is inevitable because it is a protected function.
-     *
-     * @param  array  $args
-     * @return string|null
-     */
-    protected function getEnvironmentArgument(array $args)
-    {
-        return Arr::first($args, function ($value) {
-            return Str::startsWith($value, '--env');
-        });
+        $checker->checkEnvironment($_SERVER['argv']);
+        $checker->checkDotEnvHash();
     }
 }
