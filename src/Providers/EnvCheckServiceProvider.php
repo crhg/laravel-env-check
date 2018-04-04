@@ -10,6 +10,8 @@ namespace Crhg\EnvCheck\Providers;
 
 
 use Crhg\EnvCheck\EnvChecker;
+use Illuminate\Console\Events\CommandStarting;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 
 class EnvCheckServiceProvider extends ServiceProvider
@@ -23,7 +25,15 @@ class EnvCheckServiceProvider extends ServiceProvider
             __DIR__.'/../../config/env_check.php' => config_path('env_check.php'),
         ]);
 
-        $this->check();
+        if (app()->runningInConsole()) {
+            $dispatcher = app()->make(Dispatcher::class);
+            $dispatcher->listen(CommandStarting::class,
+                function (CommandStarting $event) {
+                    $this->check($event->command);
+                });
+        } else {
+            $this->check();
+        }
     }
 
     /**
@@ -35,13 +45,11 @@ class EnvCheckServiceProvider extends ServiceProvider
     }
 
     /**
-     *
+     * @param string|null $command artisan command name (if running in console)
      */
-    protected function check()
+    protected function check($command = null)
     {
         $checker = $this->app->make(EnvChecker::class);
-
-        $checker->checkEnvironment($_SERVER['argv']);
-        $checker->checkDotEnvHash();
+        $checker->check($command);
     }
 }

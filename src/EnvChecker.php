@@ -14,13 +14,42 @@ use Illuminate\Support\Str;
 
 class EnvChecker
 {
+
+    /**
+     *
+     * @param string|null $command artisan command name (if running in console)
+     * @throws \Exception
+     */
+    public function check($command)
+    {
+        if (!app()->configurationIsCached()) {
+            return;
+        }
+
+        if (isset($commnad) && $this->isExcludedCommand($command)) {
+            return;
+        }
+
+        $this->checkEnvironment();
+        $this->checkDotEnvHash();
+    }
+
+    /**
+     * @param string $command
+     * @return bool
+     */
+    protected function isExcludedCommand(string $command)
+    {
+        return in_array($command, config('excluded_command', []));
+    }
+
     /**
      * If --env option is specified, check specified environment is equals to app.env configuration.
      * If they are different, throws an exception
      *
      * @throws \Exception
      */
-    public function checkEnvironment()
+    protected function checkEnvironment()
     {
         $specified_env = $this->detectEnvironment();
 
@@ -102,12 +131,8 @@ class EnvChecker
      *
      * @throws \Exception
      */
-    public function checkDotEnvHash()
+    protected function checkDotEnvHash()
     {
-        if (!config('env_check.verify_env_hash')) {
-            return;
-        }
-
         $saved_hash = config('env_check.dot_env_hash');
         if (is_null($saved_hash)) {
             return;
@@ -122,7 +147,7 @@ class EnvChecker
             return;
         }
 
-        throw new \Exception('dot env hash not match');
+        throw new \Exception(sprintf('dot env hash not match: file=%s', $this->dotEnvPath()));
     }
 
     /**
