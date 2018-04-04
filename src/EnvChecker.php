@@ -40,7 +40,7 @@ class EnvChecker
      */
     protected function isExcludedCommand(string $command)
     {
-        return in_array($command, config('excluded_command', []));
+        return in_array($command, config('env_check.excluded_command', []));
     }
 
     /**
