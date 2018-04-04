@@ -26,7 +26,7 @@ class EnvChecker
             return;
         }
 
-        if (isset($commnad) && $this->isExcludedCommand($command)) {
+        if (isset($command) && $this->isExcludedCommand($command)) {
             return;
         }
 
