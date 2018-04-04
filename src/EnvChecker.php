@@ -14,6 +14,21 @@ use Illuminate\Support\Str;
 
 class EnvChecker
 {
+    // command name or command group(end with ':')
+    protected static $default_exclude_command = [
+        "clear-compiled",
+        "help",
+        "list",
+        "optimize",
+        "phpcs",
+        "preset",
+        "config:",
+        "make:",
+        "package:discover",
+        "phpcs:fix",
+        "route:",
+        "vendor:publish",
+    ];
 
     /**
      *
@@ -40,7 +55,18 @@ class EnvChecker
      */
     protected function isExcludedCommand(string $command)
     {
-        return in_array($command, config('env_check.excluded_command', []));
+        foreach (array_merge(config('env_check.excluded_command'), self::$default_exclude_command) as $e) {
+            if (ends_with(':', $e)) {
+                if (starts_with($e, $command)) {
+                    return true;
+                }
+            } else {
+                if ($command === $e) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

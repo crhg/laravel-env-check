@@ -8,14 +8,9 @@
 use Crhg\EnvCheck\EnvChecker;
 
 return [
-    // List of artisan commands which should not be checked
+    // Additional list of artisan commands which should not be checked
+    // If specified string ends with ':', it is treated as a command group.
     'excluded_command' => [
-        // List command is used for completion with the laravel5 plugin of oh-my-zsh.
-        'list',
-
-        // These commands should be usable regardless of cache state
-        'config:cache',
-        'config:clear',
     ],
 
     // This is to save the hash value of the current env file. Don't touch.
