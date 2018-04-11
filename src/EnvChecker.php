@@ -9,6 +9,7 @@
 namespace Crhg\EnvCheck;
 
 
+use Crhg\EnvCheck\Exceptions\EnvCheckErrorException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -35,16 +36,16 @@ class EnvChecker
     /**
      *
      * @param string|null $command artisan command name (if running in console)
-     * @throws \Exception
+     * @throws EnvCheckErrorException
      */
     public function check($command)
     {
         if ($command === 'config:cache') {
             if ($this->isEnvOptionSpecified()) {
-                throw new \Exception("Don't use --env option with config:cache");
+                throw new EnvCheckErrorException("Don't use --env option with config:cache");
             }
             if ($this->is_app_env_specified) {
-                throw new \Exception("Don't set APP_ENV environment variable with config:cache");
+                throw new EnvCheckErrorException("Don't set APP_ENV environment variable with config:cache");
             }
 
             return;
@@ -59,15 +60,15 @@ class EnvChecker
         }
 
         if ($this->isEnvOptionSpecified()) {
-            throw new \Exception("Don't use --env option when configuration is cached");
+            throw new EnvCheckErrorException("Don't use --env option when configuration is cached");
         }
 
         if ($this->is_app_env_specified) {
-            throw new \Exception("Don't set APP_ENV environment variable when configuration is cached");
+            throw new EnvCheckErrorException("Don't set APP_ENV environment variable when configuration is cached");
         }
 
         if (!$this->checkDotEnvHash()) {
-            throw new \Exception('.env hash unmatch');
+            throw new EnvCheckErrorException('.env hash unmatch');
         }
     }
 
