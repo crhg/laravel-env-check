@@ -50,21 +50,17 @@ php artisan vendor:publish --provider='Crhg\EnvCheck\Providers\EnvCheckServicePr
 
 # 例
 
-`local`環境がキャッシュされているとき:
+* 設定がキャッシュされているとき:
 
 ```console
-% php artisan --env=testing migrate:status
+% php artisan migrate:status --env=foo
+Don't use --env option when configuration is cached
 
-In EnvCheckServiceProvider.php line 38:
+```
 
-  env is specified but its different from current environment. (specified=testing, app.env=local)
+* `config:cache`した後に`.env`を書き換えたとき:
 
-
-% APP_ENV=testing php artisan migrate:status
-
-In EnvCheckServiceProvider.php line 38:
-
-  env is specified but its different from current environment. (specified=testing, app.env=local)
-
-
+```console
+% php artisan migrate:status
+.env hash unmatch
 ```
