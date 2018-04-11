@@ -34,6 +34,20 @@ composer require crhg/laravel-env-check
 php artisan vendor:publish --provider='Crhg\EnvCheck\Providers\EnvCheckServiceProvider'
 ```
 
+以下のコードを `bootstrap/app.php` の `return $app;` の手前に追加します。
+
+```php
+        $app->singleton(\Crhg\EnvCheck\EnvChecker::class);
+
+        $app->beforeBootstrapping(
+            \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables,
+            function ($app) {
+                $checker = $app->make(\Crhg\EnvCheck\EnvChecker::class);
+                $checker->examineEnvironmentVariables();
+            }
+        );
+```
+
 # 例
 
 `local`環境がキャッシュされているとき:

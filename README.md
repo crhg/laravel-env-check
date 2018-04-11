@@ -34,6 +34,20 @@ composer require crhg/laravel-env-check
 php artisan vendor:publish --provider='Crhg\EnvCheck\Providers\EnvCheckServiceProvider'
 ```
 
+Add the following code before `return $app` in `bootstrap/app.php`;
+
+```php
+        $app->singleton(\Crhg\EnvCheck\EnvChecker::class);
+
+        $app->beforeBootstrapping(
+            \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables,
+            function ($app) {
+                $checker = $app->make(\Crhg\EnvCheck\EnvChecker::class);
+                $checker->examineEnvironmentVariables();
+            }
+        );
+```
+
 # EXAMPLE
 
 If `local` environment is cached:

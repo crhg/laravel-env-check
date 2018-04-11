@@ -12,8 +12,6 @@ namespace Crhg\EnvCheck\Providers;
 use Crhg\EnvCheck\EnvChecker;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Support\ServiceProvider;
 
 class EnvCheckServiceProvider extends ServiceProvider
@@ -36,23 +34,6 @@ class EnvCheckServiceProvider extends ServiceProvider
         } else {
             $this->check();
         }
-    }
-
-    /**
-     *
-     */
-    public function register()
-    {
-        $this->app->singleton(EnvChecker::class);
-
-        $this->app->beforeBootstrapping(
-            LoadEnvironmentVariables::class,
-            function (Application $app) {
-                /** @var EnvChecker $checker */
-                $checker = $app->make(EnvChecker::class);
-                $checker->examineEnvironmentVariables();
-            }
-        );
     }
 
     /**
