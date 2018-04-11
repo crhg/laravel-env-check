@@ -78,8 +78,8 @@ class EnvChecker
     protected function isExcludedCommand(string $command)
     {
         foreach (array_merge(config('env_check.excluded_command', []), self::$default_exclude_command) as $e) {
-            if (ends_with(':', $e)) {
-                if (starts_with($e, $command)) {
+            if (ends_with($e,':')) {
+                if (starts_with($command, $e)) {
                     return true;
                 }
             } else {
