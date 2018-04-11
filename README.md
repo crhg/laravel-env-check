@@ -1,19 +1,24 @@
 # SUMMARY
 
-When the configuration is cached, this package checks whether it is in the same environment as the specified environment.
+Enhance checking of configuration cache and environment.
 
 # DESCRIPTION
 
-## Check consistency with the environment specified by `--env` option or `APP_ENV` environment variable
+## Prohibit designation of an explicit environment when configuration is cached
 
 Laravel's environment can be sepcified with the `--env` option of artisan command or `APP_ENV` environment variable, but specified environment is ignored when the configuration is cached.
 
-Since this is potentially dangerous, this package adds the ability to check if the environment specified by the `--env` option or `APP_ENV` envonvariable is equal to the setting of `app.env`.
+Since this is potentially dangerous, when configuration is cached, it is prohibited to specify the environment with `--env` option or` APP_ENV` environment variable.
 
-## Check consistency with .env file
+## Prohibit designation of environment for `config:cache` command
 
-Saves the checksum of the .env file when the config cache is generated.
-It is checked whether it matches that of the current .env file.
+When generating the configuration cache with the `config: cache` command, prohibit specification of the environment with the` --env` option or the `APP_ENV` environment variable.
+Therefore, only the default environment described in the `.env` file can be cached.
+
+## Check consistency with `.env` file
+
+Saves the checksum of the `.env` file when the config cache is generated.
+It is checked whether it matches that of the current `.env` file.
 If they do not match, an error will occur.
 
 ## Commands to be excluded from check

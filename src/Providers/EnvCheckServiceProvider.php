@@ -12,6 +12,8 @@ namespace Crhg\EnvCheck\Providers;
 use Crhg\EnvCheck\EnvChecker;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Support\ServiceProvider;
 
 class EnvCheckServiceProvider extends ServiceProvider
@@ -22,7 +24,7 @@ class EnvCheckServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../../config/env_check.php' => config_path('env_check.php'),
+            __DIR__ . '/../../config/env_check.php' => config_path('env_check.php'),
         ]);
 
         if (app()->runningInConsole()) {
@@ -41,14 +43,25 @@ class EnvCheckServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(EnvChecker::class);
+        $this->app->singleton(EnvChecker::class);
+
+        $this->app->beforeBootstrapping(
+            LoadEnvironmentVariables::class,
+            function (Application $app) {
+                /** @var EnvChecker $checker */
+                $checker = $app->make(EnvChecker::class);
+                $checker->examineEnvironmentVariables();
+            }
+        );
     }
 
     /**
      * @param string|null $command artisan command name (if running in console)
+     * @throws \Exception
      */
     protected function check($command = null)
     {
+        /** @var EnvChecker $checker */
         $checker = $this->app->make(EnvChecker::class);
         $checker->check($command);
     }

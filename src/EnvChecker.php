@@ -30,6 +30,8 @@ class EnvChecker
         "vendor:publish",
     ];
 
+    protected $is_app_env_specified = false;
+
     /**
      *
      * @param string|null $command artisan command name (if running in console)
@@ -37,6 +39,17 @@ class EnvChecker
      */
     public function check($command)
     {
+        if ($command === 'config:cache') {
+            if ($this->isEnvOptionSpecified()) {
+                throw new \Exception("Don't use --env option with config:cache");
+            }
+            if ($this->is_app_env_specified) {
+                throw new \Exception("Don't set APP_ENV environment variable with config:cache");
+            }
+
+            return;
+        }
+
         if (!app()->configurationIsCached()) {
             return;
         }
@@ -45,8 +58,17 @@ class EnvChecker
             return;
         }
 
-        $this->checkEnvironment();
-        $this->checkDotEnvHash();
+        if ($this->isEnvOptionSpecified()) {
+            throw new \Exception("Don't use --env option when configuration is cached");
+        }
+
+        if ($this->is_app_env_specified) {
+            throw new \Exception("Don't set APP_ENV environment variable when configuration is cached");
+        }
+
+        if (!$this->checkDotEnvHash()) {
+            throw new \Exception('.env hash unmatch');
+        }
     }
 
     /**
@@ -55,7 +77,7 @@ class EnvChecker
      */
     protected function isExcludedCommand(string $command)
     {
-        foreach (array_merge(config('env_check.excluded_command'), self::$default_exclude_command) as $e) {
+        foreach (array_merge(config('env_check.excluded_command', []), self::$default_exclude_command) as $e) {
             if (ends_with(':', $e)) {
                 if (starts_with($e, $command)) {
                     return true;
@@ -69,67 +91,16 @@ class EnvChecker
         return false;
     }
 
-    /**
-     * If --env option is specified, check specified environment is equals to app.env configuration.
-     * If they are different, throws an exception
-     *
-     * @throws \Exception
-     */
-    protected function checkEnvironment()
+    protected function isEnvOptionSpecified()
     {
-        $specified_env = $this->detectEnvironment();
-
-        if (isset($specified_env) && $specified_env !== config('app.env')) {
-            throw new \Exception(
-                sprintf(
-                    'env is specified but its different from current environment. (specified=%s, app.env=%s)',
-                    $specified_env,
-                    config('app.env')
-                )
-            );
-        }
-    }
-
-    /**
-     * Return environment string if it is specified by --env option or APP_ENV environment variable.
-     * If it is not specified, return null.
-     *
-     * @return null|string
-     */
-    protected function detectEnvironment()
-    {
-        return $this->detectConsoleEnvironment() ?? $this->detectAppEnvEnvironment();
-    }
-
-    /**
-     * Detect environment from environment variables
-     *
-     * If APP_ENV environment variable is set, return its value.
-     * Otherwise, return null.
-     *
-     * @return string|null
-     */
-    protected function detectAppEnvEnvironment()
-    {
-        $env = \getenv('APP_ENV');
-        return ($env !== false) ? $env : null;
-    }
-
-    /**
-     * Detect environment from command-line arguments.
-     *
-     * If environment is specified by --env option, return it.
-     * Otherwise, return null.
-     *
-     * @return string|null
-     */
-    protected function detectConsoleEnvironment()
-    {
-        if (!is_null($value = $this->getEnvironmentArgument())) {
-            return head(array_slice(explode('=', $value), 1));
-        }
-
-        return null;
+        return !is_null(
+            Arr::first(
+                $_SERVER['argv'],
+                function ($value) {
+                    return Str::startsWith($value, '--env');
+                }
+            )
+        );
     }
 
     /**
@@ -151,29 +122,37 @@ class EnvChecker
     }
 
     /**
+     * Examine if APP_ENV environment variable is set and save result
+     */
+    public function examineEnvironmentVariables()
+    {
+        $this->is_app_env_specified = \getenv('APP_ENV') !== false;
+    }
+
+    /**
      * Check if check-sum of dot file is same as stored in config.
      *
      * Skip check if env.check.verify_env_hash is false.
      *
-     * @throws \Exception
+     * @return bool true if check is OK
      */
     protected function checkDotEnvHash()
     {
         $saved_hash = config('env_check.dot_env_hash');
         if (is_null($saved_hash)) {
-            return;
+            return true;
         }
 
         $hash = $this->dotEnvHash();
         if (is_null($hash)) {
-            return;
+            return true;
         }
 
         if ($hash === $saved_hash) {
-            return;
+            return true;
         }
 
-        throw new \Exception(sprintf('dot env hash not match: file=%s', $this->dotEnvPath()));
+        return false;
     }
 
     /**
@@ -195,8 +174,6 @@ class EnvChecker
 
     protected function dotEnvPath()
     {
-        $env = $this->detectEnvironment();
-        $ext = isset($env) ? ".$env" : "";
-        return app()->environmentPath() . '/.env' . $ext;
+        return app()->environmentPath() . '/.env';
     }
 }
