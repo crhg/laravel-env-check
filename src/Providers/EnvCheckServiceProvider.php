@@ -10,6 +10,7 @@ namespace Crhg\EnvCheck\Providers;
 
 
 use Crhg\EnvCheck\EnvChecker;
+use Crhg\EnvCheck\Exceptions\EnvCheckErrorException;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
@@ -29,7 +30,12 @@ class EnvCheckServiceProvider extends ServiceProvider
             $dispatcher = app()->make(Dispatcher::class);
             $dispatcher->listen(CommandStarting::class,
                 function (CommandStarting $event) {
-                    $this->check($event->command);
+                    try {
+                        $this->check($event->command);
+                    } catch (EnvCheckErrorException $e) {
+                        $event->output->writeln($e->getMessage());
+                        exit(1);
+                    }
                 });
         } else {
             $this->check();
@@ -38,7 +44,7 @@ class EnvCheckServiceProvider extends ServiceProvider
 
     /**
      * @param string|null $command artisan command name (if running in console)
-     * @throws \Exception
+     * @throws EnvCheckErrorException
      */
     protected function check($command = null)
     {

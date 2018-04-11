@@ -50,20 +50,17 @@ Add the following code before `return $app` in `bootstrap/app.php`;
 
 # EXAMPLE
 
-If `local` environment is cached:
+* If `local` environment is cached:
 
 ```console
-% php artisan --env=testing migrate:status
+% php artisan migrate:status --env=foo
+Don't use --env option when configuration is cached
 
-In EnvCheckServiceProvider.php line 38:
+```
 
-  env is specified but its different from current environment. (specified=testing, app.env=local)
+* If `.env` is modified after `config:cache`:
 
-
-% APP_ENV=testing php artisan migrate:status
-
-In EnvCheckServiceProvider.php line 38:
-
-  env is specified but its different from current environment. (specified=testing, app.env=local)
-
+```console
+% php artisan migrate:status
+.env hash unmatch
 ```
