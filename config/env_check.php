@@ -13,7 +13,8 @@ return [
     'excluded_command' => [
     ],
 
-    // This is to save the hash value of the current env file. Don't touch.
+    // This is to save the hash value of the current env file.
+    // Skip hash check if this is set to null.
     'dot_env_hash' => with(
         app()->make(EnvChecker::class),
         function (EnvChecker $checker) {

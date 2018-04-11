@@ -15,7 +15,7 @@
     },
     "require": {
         "php": ">=7.0",
-        "illuminate/support": "^5.5"
+        "laravel/framework": "^5.5"
     },
     "extra": {
         "laravel": {
@@ -23,24 +23,7 @@
                 "Crhg\\EnvCheck\\Providers\\EnvCheckServiceProvider"
             ]
         }
+    },
+    "require-dev": {
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
