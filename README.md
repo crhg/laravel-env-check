@@ -40,7 +40,7 @@ Add the following code before `return $app` in `bootstrap/app.php`;
         $app->singleton(\Crhg\EnvCheck\EnvChecker::class);
 
         $app->beforeBootstrapping(
-            \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables,
+            \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
             function ($app) {
                 $checker = $app->make(\Crhg\EnvCheck\EnvChecker::class);
                 $checker->examineEnvironmentVariables();

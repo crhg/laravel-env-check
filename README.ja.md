@@ -40,7 +40,7 @@ php artisan vendor:publish --provider='Crhg\EnvCheck\Providers\EnvCheckServicePr
         $app->singleton(\Crhg\EnvCheck\EnvChecker::class);
 
         $app->beforeBootstrapping(
-            \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables,
+            \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
             function ($app) {
                 $checker = $app->make(\Crhg\EnvCheck\EnvChecker::class);
                 $checker->examineEnvironmentVariables();
